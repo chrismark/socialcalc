@@ -4933,6 +4933,7 @@ SocialCalc.Formula.IoFunctions = function(fname, operand, foperand, sheet, coord
 
    var argList = {
 				 BUTTON: [2]
+        ,ONEDITDO: [12, 14, 1]
         ,IMAGEBUTTON: [2]
    			,EMAIL: [14, 14, 14, 14]
 				,EMAILIF: [13, 14, 14, 14, 14]
@@ -5111,6 +5112,12 @@ SocialCalc.Formula.IoFunctions = function(fname, operand, foperand, sheet, coord
           resulttype = "ti"+fname; // (t)ext value with (i)nterface (,) 
           result = "Send Now";
           break;
+
+      case "ONEDITDO":
+          resulttype = "ti"+fname;
+          // if 2nd arg is a text, display it; else display blank
+          result = operand_type[2] == 't' ? operand_value[2] : '';
+          break;
 		 
       case "CHECKBOX":
       case "RADIOBUTTON":
@@ -5247,6 +5254,8 @@ SocialCalc.Formula.IoFunctions = function(fname, operand, foperand, sheet, coord
          
       }
 
+SocialCalc.DebugLog({IoFunctions_PushOperand: {operand:operand, resulttype:resulttype, result:result}});
+
    scf.PushOperand(operand, resulttype, result);
    return;
 
@@ -5261,6 +5270,7 @@ SocialCalc.Formula.IoFunctions = function(fname, operand, foperand, sheet, coord
 
 
 SocialCalc.Formula.FunctionList["BUTTON"] = [SocialCalc.Formula.IoFunctions, 1, "label", "", "gui", "<button type='button' onclick=\"SocialCalc.TriggerIoAction.Button('<%=cell_reference%>');\"><%=formated_value%></button>" , "ParameterList" ];
+SocialCalc.Formula.FunctionList["ONEDITDO"] = [SocialCalc.Formula.IoFunctions, -2, "trigger_range, name_range_or_text, id", "", "action", "<%=formated_value%>", "EventTree"];
 SocialCalc.Formula.FunctionList["IMAGEBUTTON"] = [SocialCalc.Formula.IoFunctions, 1, "imageurl", "", "gui", "<input type='image' src='<%=display_value%>' alt='Submit' onclick=\"SocialCalc.TriggerIoAction.Button('<%=cell_reference%>');\">", "ParameterList"  ];
 SocialCalc.Formula.FunctionList["EMAIL"] = [SocialCalc.Formula.IoFunctions, -3, "to_range subject_range, body_range", "", "action", "<button type='button' onclick=\"SocialCalc.TriggerIoAction.Email('<%=cell_reference%>');\"><%=formated_value%></button>", "ParameterList" ];
 SocialCalc.Formula.FunctionList["EMAILIF"] = [SocialCalc.Formula.IoFunctions, -4, "condition_range, to_range subject_range, body_range", "", "action", "<button type='button' onclick=\"SocialCalc.TriggerIoAction.Email('<%=cell_reference%>');\"><%=formated_value%></button>", "ParameterList" ];
