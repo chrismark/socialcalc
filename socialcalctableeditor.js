@@ -1007,7 +1007,9 @@ SocialCalc.EditorSheetStatusCallback = function(recalcdata, status, arg, editor)
       case "confirmemailsent":
         break;
       // } EditorSheetStatusCallback eddy 
-         
+      case "updatingopsettings": case "confirmupdateop":
+         break;
+
       default:
     	 alert("Unknown status: "+status);
          break;
@@ -1074,6 +1076,11 @@ SocialCalc.EditorGetStatuslineString = function(editor, status, arg, params) {
         	 params.emailing = "done";
          }
          // } eddy EditorGetStatuslineString 
+         if (params.updatingopsettings == "updated") {
+            progress = params.updatingopresponse;
+            params.updatingopresponse = "";
+            params.updatingopsettings = "done";
+         }
          break;
          
       case "calcorder":
@@ -1110,7 +1117,17 @@ SocialCalc.EditorGetStatuslineString = function(editor, status, arg, params) {
      	 params.emailreponse += arg;
          break;    	  
       // } eddy EditorGetStatuslineString 
-         
+      case "updatingopsettings":
+       params.updatingopsettings = "updating";
+       params.updatingopresponse = "";
+         break;
+      case "confirmupdateop":
+       params.updatingopsettings = "updated";
+       if (typeof params.updatingopresponse === 'undefined') {
+         params.updatingopresponse = "";
+       }
+       params.updatingopresponse += arg;
+
       default:
          progress = status;
          break;
@@ -1125,6 +1142,12 @@ SocialCalc.EditorGetStatuslineString = function(editor, status, arg, params) {
   	 progress += params.emailreponse;
    }   
    // } eddy EditorGetStatuslineString 
+   if (params.updatingopsettings == "updating") {
+      progress = "Updating Order Presc. settings...";
+   }
+   if (params.updatingopsettings == "updated") {
+      progress = params.updatingopresponse;
+   }
    
    if (!progress && params.calculating) {
       progress = scc.s_statusline_calculating;
@@ -2390,6 +2413,7 @@ SocialCalc.EditedTriggerCell  = function(actionFormulaCells, editedCellRef, edit
             if(typeof parameters === 'undefined') continue;	
 			
 			switch(parameters.function_name) {
+              case "ONEDITDO":
 				  case "EMAILONEDIT" :
 				  case "EMAILONEDITIF" :
 					  cmdline = "setemailparameters "+actionCellId+ " " + editedCellRef;

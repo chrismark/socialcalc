@@ -5644,9 +5644,14 @@ SocialCalc.TriggerIoAction.Email = function(emailFormulaCellId, optionalTriggerC
 	 var sheet = spreadsheet.sheet;
 	 var cell = sheet.cells[emailFormulaCellId];
 	 
+   SocialCalc.DebugLog({TriggerIoAction_Email: {emailFormulaCellId: emailFormulaCellId, optionalTriggerCellId: optionalTriggerCellId, cell:cell}});
+
 	 if(typeof sheet.ioParameterList === 'undefined') return;
 	 
 	 var parameters = sheet.ioParameterList[emailFormulaCellId];
+
+   SocialCalc.DebugLog({TriggerIoAction_Email: {parameters: parameters}});
+   
    if(typeof parameters === 'undefined') return;
    //var debugLog = "debug TriggerIoAction.Email\n"; //eddy
 
@@ -5682,7 +5687,12 @@ SocialCalc.TriggerIoAction.Email = function(emailFormulaCellId, optionalTriggerC
 		 }
 	 }
 
-	 
+   SocialCalc.DebugLog({maxRangeSize: maxRangeSize, parameterValues: parameterValues, parameterCellRefs: parameterCellRefs});
+
+   if (parameters.function_name == "ONEDITDO") {
+      SocialCalc.DebugLog({command: "updateopsettings "+parameterValues[1].join(',')+" "+parameterValues[0].join(',')});
+   }
+    	 
     var conditionIndex = -1; // check if email formula is conditional, -1 = not conditional 
     var toAddressParamOffset = 0;
     switch (parameters.function_name) {
@@ -5705,6 +5715,7 @@ SocialCalc.TriggerIoAction.Email = function(emailFormulaCellId, optionalTriggerC
 
     
     switch (parameters.function_name) {
+        case "ONEDITDO":
         case "EMAILONEDIT":
         case "EMAILONEDITIF":
 	       if(optionalTriggerCellId && parameters[0].type == 'coord' && parameters[0].value == optionalTriggerCellId ) optionalTriggerCellId = null;
@@ -5716,6 +5727,23 @@ SocialCalc.TriggerIoAction.Email = function(emailFormulaCellId, optionalTriggerC
      var setStatusBarMessage = false;
 
    var emailContentsList = [];
+
+   if (parameters.function_name == "ONEDITDO") {
+     // loop thru each involved cell....
+    for(var rangeIndex = maxRangeSize -1; rangeIndex > -1; rangeIndex-- ) {
+     // skip cells that didn't trigger the edit..
+     if(optionalTriggerCellId && optionalTriggerCellId != parameterCellRefs[0][rangeIndex]) continue;
+     // send: name, value, id
+     // 'parameterValues':[['2','2','3'],['MY_ORDER','MIN_HOLD','START_INVENTORY']],'parameterCellRefs':[['C1','C2','C3'],['B1','B2','B3']]
+     var valueRangeIndex = (rangeIndex >= parameterValues[0].length) ? 0 : rangeIndex;
+     var nameRangeIndex = (rangeIndex >= parameterValues[1].length) ? 0 : rangeIndex;
+     //var idRangeIndex = (rangeIndex >= parameterValues[2].length) ? 0 : rangeIndex;
+
+     sheet.ScheduleSheetCommands('updateopsettings '+parameterValues[1][nameRangeIndex]+' '+parameterValues[0][valueRangeIndex]+' '+parameters[2].value,  false); 
+     SocialCalc.EditorSheetStatusCallback(null, "updatingopsettings", null, spreadsheet.editor);
+    }
+    return [];
+   }
 
 	 for(var rangeIndex = maxRangeSize -1; rangeIndex > -1; rangeIndex-- ) {
 		 

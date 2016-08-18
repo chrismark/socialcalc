@@ -3259,7 +3259,8 @@ SocialCalc.ExecuteSheetCommand = function(sheet, cmd, saveundo) {
     	  // email/form/timetrigger handled by server, so ignore here
     	  break;
          // } eddy ExecuteSheetCommand 
-    	  
+    	case "updateopsettings":
+        break;
       default:
          errortext = scc.s_escUnknownCmd+cmdstr;
          break;
