@@ -20014,7 +20014,7 @@ SocialCalc.Formula.IoFunctions = function(fname, operand, foperand, sheet, coord
 
    var argList = {
 				 BUTTON: [2]
-        ,ONEDITDO: [12, 14, 1]
+        ,ONEDITDO: [12, 14, 4]
         ,IMAGEBUTTON: [2]
    			,EMAIL: [14, 14, 14, 14]
 				,EMAILIF: [13, 14, 14, 14, 14]
@@ -20351,7 +20351,7 @@ SocialCalc.DebugLog({IoFunctions_PushOperand: {operand:operand, resulttype:resul
 
 
 SocialCalc.Formula.FunctionList["BUTTON"] = [SocialCalc.Formula.IoFunctions, 1, "label", "", "gui", "<button type='button' onclick=\"SocialCalc.TriggerIoAction.Button('<%=cell_reference%>');\"><%=formated_value%></button>" , "ParameterList" ];
-SocialCalc.Formula.FunctionList["ONEDITDO"] = [SocialCalc.Formula.IoFunctions, -2, "trigger_range, name_range_or_text, id", "", "action", "<%=formated_value%>", "EventTree"];
+SocialCalc.Formula.FunctionList["ONEDITDO"] = [SocialCalc.Formula.IoFunctions, -2, "trigger_range, name_range_or_text, sku_cell_coord", "", "action", "<%=formated_value%>", "EventTree"];
 SocialCalc.Formula.FunctionList["IMAGEBUTTON"] = [SocialCalc.Formula.IoFunctions, 1, "imageurl", "", "gui", "<input type='image' src='<%=display_value%>' alt='Submit' onclick=\"SocialCalc.TriggerIoAction.Button('<%=cell_reference%>');\">", "ParameterList"  ];
 SocialCalc.Formula.FunctionList["EMAIL"] = [SocialCalc.Formula.IoFunctions, -3, "to_range subject_range, body_range", "", "action", "<button type='button' onclick=\"SocialCalc.TriggerIoAction.Email('<%=cell_reference%>');\"><%=formated_value%></button>", "ParameterList" ];
 SocialCalc.Formula.FunctionList["EMAILIF"] = [SocialCalc.Formula.IoFunctions, -4, "condition_range, to_range subject_range, body_range", "", "action", "<button type='button' onclick=\"SocialCalc.TriggerIoAction.Email('<%=cell_reference%>');\"><%=formated_value%></button>", "ParameterList" ];
@@ -20770,7 +20770,7 @@ SocialCalc.TriggerIoAction.Email = function(emailFormulaCellId, optionalTriggerC
 
    SocialCalc.DebugLog({maxRangeSize: maxRangeSize, parameterValues: parameterValues, parameterCellRefs: parameterCellRefs});
 
-   if (parameters.function_name == "ONEDITDO") {
+   if (parameters.function_name == "`") {
       SocialCalc.DebugLog({command: "updateopsettings "+parameterValues[1].join(',')+" "+parameterValues[0].join(',')});
    }
     	 
@@ -20818,9 +20818,9 @@ SocialCalc.TriggerIoAction.Email = function(emailFormulaCellId, optionalTriggerC
      // 'parameterValues':[['2','2','3'],['MY_ORDER','MIN_HOLD','START_INVENTORY']],'parameterCellRefs':[['C1','C2','C3'],['B1','B2','B3']]
      var valueRangeIndex = (rangeIndex >= parameterValues[0].length) ? 0 : rangeIndex;
      var nameRangeIndex = (rangeIndex >= parameterValues[1].length) ? 0 : rangeIndex;
-     //var idRangeIndex = (rangeIndex >= parameterValues[2].length) ? 0 : rangeIndex;
+     var skuRangeIndex = (rangeIndex >= parameterValues[2].length) ? 0 : rangeIndex;
 
-     sheet.ScheduleSheetCommands('updateopsettings '+parameterValues[1][nameRangeIndex]+' '+parameterValues[0][valueRangeIndex]+' '+parameters[2].value,  false); 
+     sheet.ScheduleSheetCommands('updateopsettings '+parameterValues[1][nameRangeIndex]+' '+parameterValues[0][valueRangeIndex]+' '+parameterValues[2][skuRangeIndex],  false);
      SocialCalc.EditorSheetStatusCallback(null, "updatingopsettings", null, spreadsheet.editor);
     }
     return [];
